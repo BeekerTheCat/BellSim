@@ -18,6 +18,8 @@ PAUSE_PROMPT = True
 # MAIN
 def main(state_db: str, trial_db: str, verbose: bool, pause_prompt: bool):
     sim = BellSim(vv=verbose, pp=pause_prompt)
+    sim.initialize_db('state', state_db)
+    sim.initialize_db('trial', trial_db)
 
 
 # RUN
