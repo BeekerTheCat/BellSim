@@ -85,7 +85,7 @@ class StateDB(Database):
 
     def _populate_angle(self):
         formatted_fields = self.angle.format_insert_fields(["angle"])
-        formatted_values = self.angle.format_insert_values([*range(360)])
+        formatted_values = self.angle.format_insert_values([*((value,) for value in range(360))])
         sql = f"{self.angle.get_sql("insert")} {formatted_fields} VALUES {formatted_values};"
         self.execute(sql)
         self.commit()
@@ -93,13 +93,13 @@ class StateDB(Database):
     def _populate_photon(self):
         bitstring = ("1" * 90 + "0" * 90) * 2
         values = []
-        formatted_fields = self.angle.format_insert_fields(["state_as_integer_as_text", "state_as_bitstring_as_text"])
+        formatted_fields = self.photon.format_insert_fields(["state_as_integer_as_text", "state_as_bitstring_as_text"])
         for n in range(180):
             state_as_bs = bitstring[n:] + bitstring[:n]
             state_as_int = int(state_as_bs, 2)
             values.append((state_as_int, state_as_bs))
-        formatted_values = self.angle.format_insert_values(values)
-        sql = f"{self.angle.get_sql("insert")} {formatted_fields} VALUES {formatted_values};"
+        formatted_values = self.photon.format_insert_values(values)
+        sql = f"{self.photon.get_sql("insert")} {formatted_fields} VALUES {formatted_values};"
         self.execute(sql)
         self.commit()
 
@@ -119,9 +119,9 @@ class StateDB(Database):
                 for result in (o_p1 & o_p2, z_p1 & z_p2, o_p1 & z_p2, z_p1 & o_p2):
                     values.add((result, f"{result:0360b}"))
 
-        formatted_fields = self.angle.format_insert_fields(["state_as_integer_as_text", "state_as_bitstring_as_text"])
-        formatted_values = self.angle.format_insert_values(list(values))
-        sql = f"{self.angle.get_sql("insert")} {formatted_fields} VALUES {formatted_values};"
+        formatted_fields = self.bitwise.format_insert_fields(["state_as_integer_as_text", "state_as_bitstring_as_text"])
+        formatted_values = self.bitwise.format_insert_values(list(values))
+        sql = f"{self.bitwise.get_sql("insert")} {formatted_fields} VALUES {formatted_values};"
         self.execute(sql)
         self.commit()
 
