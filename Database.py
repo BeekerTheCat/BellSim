@@ -1,5 +1,8 @@
 # STANDARD IMPORTS
 from __future__ import annotations
+from typing import Optional, Any
+from sqlite3 import Connection, Cursor
+import sqlite3
 # CUSTOM IMPORTS
 from Table import AngleTB, PhotonTB, BitwiseTB
 
@@ -9,13 +12,89 @@ from Table import AngleTB, PhotonTB, BitwiseTB
 # CLASSES
 class Database:
     name: str
+    connection: Connection
 
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         self.name = name
+        self.connection = sqlite3.connect(self.name)
+
+    def _get_cursor(self) -> Cursor:
+        return self.connection.cursor()
+
+    def close(self) -> None:
+        self.connection.close()
+
+    def commit(self) -> None:
+        self.connection.commit()
+
+    def execute(self, sql: str) -> Cursor:
+        return self.connection.execute(sql)
+
+    def fetch(self, sql: str) -> Cursor:
+        return self._get_cursor().execute(sql)
+
+    def fetch_one(self, sql: str) -> Optional[tuple[Any, ...]]:
+        return self._get_cursor().execute(sql).fetchone()
+
+    def fetch_many(self, sql: str, size: int) -> list[tuple[Any, ...]]:
+        return self._get_cursor().execute(sql).fetchmany(size)
 
 
 class StateDB(Database):
-    pass
+    angle: AngleTB
+    photon: PhotonTB
+    bitwise: BitwiseTB
+
+    def __init__(self, name: str) -> None:
+        super().__init__(name)
+        self._init_angle_tb()
+        self._init_photon_tb()
+        self._init_bitwise_tb()
+        self._update_table_row_counts()
+
+    def _init_angle_tb(self) -> None:
+        self.angle = AngleTB()
+        self.execute(self.angle.get_sql("create_table"))
+        self.commit()
+
+    def _init_photon_tb(self) -> None:
+        self.photon = PhotonTB()
+        self.execute(self.photon.get_sql("create_table"))
+        self.commit()
+
+    def _init_bitwise_tb(self) -> None:
+        self.bitwise = BitwiseTB()
+        self.execute(self.bitwise.get_sql("create_table"))
+        self.commit()
+
+    def _update_table_row_counts(self):
+        self.angle.row_count = self.fetch_one(self.angle.get_sql("row_count"))[0]
+        self.photon.row_count = self.fetch_one(self.photon.get_sql("row_count"))[0]
+        self.bitwise.row_count = self.fetch_one(self.bitwise.get_sql("row_count"))[0]
+
+    def populate(self, table: str):
+        match table:
+            case "angle":
+                self._populate_angle()
+            case "photon":
+                self._populate_photon()
+            case "bitwise":
+                self._populate_bitwise()
+            case _:
+                pass
+
+    def _populate_angle(self):
+        formatted_fields = self.angle.format_insert_fields(["angle"])
+        formatted_values = self.angle.format_insert_values([*range(360)])
+        sql = f"{self.angle.get_sql("insert")} {formatted_fields} VALUES {formatted_values};"
+        self.execute(sql)
+        self.commit()
+
+    def _populate_photon(self):
+        pass
+
+    def _populate_bitwise(self):
+        pass
 
 
 class TrialDB(Database):
