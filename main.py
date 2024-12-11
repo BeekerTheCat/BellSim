@@ -21,6 +21,10 @@ def main(state_db: str, trial_db: str, verbose: bool, pause_prompt: bool):
     sim.initialize_db('state', state_db)
     if sim.state.angle.row_count < 360:
         sim.state.populate("angle")
+    if sim.state.photon.row_count < 180:
+        sim.state.populate("photon")
+    if sim.state.bitwise.row_count < 16201:
+        sim.state.populate("bitwise")
     sim.initialize_db('trial', trial_db)
 
 
