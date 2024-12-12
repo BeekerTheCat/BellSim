@@ -93,7 +93,7 @@ class StateDB(Database):
     def _populate_photon(self):
         bitstring = ("1" * 90 + "0" * 90) * 2
         values = []
-        formatted_fields = self.photon.format_insert_fields(["state_as_integer_as_text", "state_as_bitstring_as_text"])
+        formatted_fields = self.photon.format_insert_fields(["state_as_integer_as_text"])
         for n in range(180):
             state_as_bs = bitstring[n:] + bitstring[:n]
             state_as_int = int(state_as_bs, 2)
@@ -108,18 +108,17 @@ class StateDB(Database):
         values = set()
 
         def circular_shift_left(shift):
+            for p1 in range(180):
+                o_p1 = circular_shift_left(p1)
+                for p2 in range(180):
+                    o_p2 = circular_shift_left(p2)
+                    z_p1 = ~o_p1 & mask
+                    z_p2 = ~o_p2 & mask
+                    for result in (o_p1 & o_p2, z_p1 & z_p2, o_p1 & z_p2, z_p1 & o_p2):
+                        values.add((result, f"{result:0360b}"))
             return ((2348542582773833227889480594892199437311494003088532853857443830130122454711100468153595086332478834295701504 << shift) | (2348542582773833227889480594892199437311494003088532853857443830130122454711100468153595086332478834295701504 >> (360 - shift))) & ((1 << 360) - 1)
 
-        for p1 in range(180):
-            o_p1 = circular_shift_left(p1)
-            for p2 in range(180):
-                o_p2 = circular_shift_left(p2)
-                z_p1 = ~o_p1 & mask
-                z_p2 = ~o_p2 & mask
-                for result in (o_p1 & o_p2, z_p1 & z_p2, o_p1 & z_p2, z_p1 & o_p2):
-                    values.add((result, f"{result:0360b}"))
-
-        formatted_fields = self.bitwise.format_insert_fields(["state_as_integer_as_text", "state_as_bitstring_as_text"])
+        formatted_fields = self.bitwise.format_insert_fields(["state_as_integer_as_text"])
         formatted_values = self.bitwise.format_insert_values(list(values))
         sql = f"{self.bitwise.get_sql("insert")} {formatted_fields} VALUES {formatted_values};"
         self.execute(sql)

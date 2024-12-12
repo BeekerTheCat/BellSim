@@ -67,7 +67,6 @@ class PhotonTB(DBTable):
         super().__init__(name)
         self._add_tb_field("id", "INTEGER", "PRIMARY KEY AUTOINCREMENT")
         self._add_tb_field("state_as_integer_as_text", "TEXT", "NOT NULL UNIQUE")
-        self._add_tb_field("state_as_bitstring_as_text", "TEXT", "NOT NULL UNIQUE")
 
 
 class BitwiseTB(PhotonTB):
