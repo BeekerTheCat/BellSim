@@ -4,7 +4,7 @@ from typing import Optional, Any
 from sqlite3 import Connection, Cursor
 import sqlite3
 # CUSTOM IMPORTS
-from Table import AngleTB, PhotonTB, BitwiseTB
+from Table import AngleTB, PhotonTB, BitwiseTB, ResultsTB
 
 
 # PARAMETERS
@@ -127,7 +127,15 @@ class StateDB(Database):
 
 
 class TrialDB(Database):
-    pass
+    results: ResultsTB
 
+    def __init__(self, name: str) -> None:
+        super().__init__(name)
+        self._init_results_tb()
+
+    def _init_results_tb(self) -> None:
+        self.results = ResultsTB()
+        self.execute(self.results.get_sql("create_table"))
+        self.commit()
 
 # EOF

@@ -26,6 +26,7 @@ def main(state_db: str, trial_db: str, verbose: bool, pause_prompt: bool):
     if sim.state.bitwise.row_count < 16201:
         sim.state.populate("bitwise")
     sim.initialize_db('trial', trial_db)
+    sim.run()
 
 
 # RUN

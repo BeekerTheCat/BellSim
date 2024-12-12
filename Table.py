@@ -75,4 +75,35 @@ class BitwiseTB(PhotonTB):
         super().__init__("bitwise")
 
 
+class ResultsTB(DBTable):
+    def __init__(self) -> None:
+        super().__init__("results")
+        self._add_tb_field("id", "INTEGER", "PRIMARY KEY AUTOINCREMENT")
+        self._add_tb_field("entanglement_state", "INTEGER", "NOT NULL")
+        self._add_tb_field("photon1_entanglement_state", "INTEGER", "NOT NULL")
+        self._add_tb_field("photon2_entanglement_state", "INTEGER", "NOT NULL")
+        self._add_tb_field("photon1_measurement_angle", "INTEGER", "NOT NULL")
+        self._add_tb_field("photon2_measurement_angle", "INTEGER", "NOT NULL")
+        self._add_tb_field("photon1_measurement_state", "INTEGER", "NOT NULL")
+        self._add_tb_field("photon2_measurement_state", "INTEGER", "NOT NULL")
+        self._add_tb_field("measurement_angle_difference", "INTEGER", "NOT NULL")
+        self._add_tb_field("p1es_p2es_oo", "INTEGER", "NOT NULL")
+        self._add_tb_field("p1es_p2es_zz", "INTEGER", "NOT NULL")
+        self._add_tb_field("p1es_p2es_oz", "INTEGER", "NOT NULL")
+        self._add_tb_field("p1es_p2es_zo", "INTEGER", "NOT NULL")
+        self._add_tb_field("p1ms_p2ms_oo", "INTEGER", "NOT NULL")
+        self._add_tb_field("p1ms_p2ms_zz", "INTEGER", "NOT NULL")
+        self._add_tb_field("p1ms_p2ms_oz", "INTEGER", "NOT NULL")
+        self._add_tb_field("p1ms_p2ms_zo", "INTEGER", "NOT NULL")
+        self._add_tb_field("p1ms_p2es_oo", "INTEGER", "NOT NULL")
+        self._add_tb_field("p1ms_p2es_zz", "INTEGER", "NOT NULL")
+        self._add_tb_field("p1ms_p2es_oz", "INTEGER", "NOT NULL")
+        self._add_tb_field("p1ms_p2es_zo", "INTEGER", "NOT NULL")
+        self._add_tb_field("p1es_p2ms_oo", "INTEGER", "NOT NULL")
+        self._add_tb_field("p1es_p2ms_zz", "INTEGER", "NOT NULL")
+        self._add_tb_field("p1es_p2ms_oz", "INTEGER", "NOT NULL")
+        self._add_tb_field("p1es_p2ms_zo", "INTEGER", "NOT NULL")
+        self._add_tb_constraint("UNIQUE(entanglement_state, photon1_measurement_angle, photon2_measurement_angle)")
+
+
 # EOF
